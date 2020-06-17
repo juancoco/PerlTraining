@@ -17,13 +17,13 @@ until($exit){
     
     my $answer = (<STDIN>);
     chomp $answer;
-    if($answer && $answer eq 1){
+    if($answer && $answer eq '1'){
         printContacts(@contacts);
-    } elsif ($answer eq 2){
+    } elsif ($answer eq '2'){
         @contacts = addContact(@contacts);
-    } elsif ($answer eq 3){
+    } elsif ($answer eq '3'){
         callContact(@contacts);
-    } elsif ($answer eq 0){
+    } elsif ($answer eq '0'){
         print "Bye \n";
         $exit = 1;
     }
@@ -32,7 +32,7 @@ until($exit){
 
 
 sub printContacts {
-    my (@contacts) = @_;
+    #my (@contacts) = @_;
     foreach my $myContact (@contacts){
         foreach my $contact (keys %{$myContact}){
             print $contact . " - " . $myContact->{$contact} . "\n";
@@ -41,7 +41,7 @@ sub printContacts {
 }
 
 sub addContact {
-    my (@contacts) = @_;
+    #my (@contacts) = @_;
     print "Ingrese nombre: \n";
     my $name = (<STDIN>);
     print "Ingrese numero: \n";
@@ -53,7 +53,7 @@ sub addContact {
 }
 
 sub callContact {
-    my (@contacts) = @_;
+    #my (@contacts) = @_;
     print "Who would you like to call? \n";
     my $contact = (<STDIN>);
     chomp $contact;
