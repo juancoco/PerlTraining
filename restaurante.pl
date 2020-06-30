@@ -2,6 +2,7 @@
 use strict;
 use warnings;
 
+
 ### FILE TYPES
 # script.pl: Script plano
 # Module.pm: Modulo
@@ -71,7 +72,7 @@ my $user_name = ask_for_name();
 
 print greet($user_name, %greetings_loption);
 
-print validate_menu_option(ask_for_menu_option(), %menu);
+print validate_menu_option((), %menu);
 
 # If defined, offer water
 offer_water() if $should_offer_water;
