@@ -1,9 +1,8 @@
+package View::View;
 
 use strict;
 use warnings;
 use Data::Dumper;
-
-package View;
 
 my @options = ("1.Registrar vendedor", "2.Registrar comprador", "3.Registrar producto", "4.Registrar venta", "5.Listar productos", "0.Exit");
 
@@ -38,12 +37,12 @@ sub mainMenu{
 
 sub inputForm{
     
-    my $sellerData = <STDIN>;
-	chomp $sellerData;
+    my $data = <STDIN>;
+	chomp $data;
     
-    my @sellerData = split(",", $sellerData);
+    my @splitedData = split(",", $data);
     
-	return @sellerData;
+	return @splitedData;
 }
 
 sub showProducts{

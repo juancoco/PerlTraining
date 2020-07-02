@@ -4,6 +4,8 @@ use strict;
 use warnings;
 use Data::Dumper;
 
+use Controller::DatabaseController;
+
 sub new{
     my $class = shift;
     my $self = {
@@ -14,6 +16,21 @@ sub new{
     
     bless $self, $class;
     return $self;
+}
+
+sub getId {
+   my( $self ) = @_;
+   return $self->{id};
+}
+
+sub getName {
+   my( $self ) = @_;
+   return $self->{name};
+}
+
+sub getEmail {
+   my( $self ) = @_;
+   return $self->{email};
 }
 
 sub setId {
@@ -34,14 +51,26 @@ sub setEmail {
    return $self->{email};
 }
 
-sub getId {
-   my( $self ) = @_;
-   return $self->{id};
+sub isDuplicatedId{
+    my ($class, $id) = @_;
+    my @users = Controller::DatabaseController->retrieveUsers;
+    foreach my $user (@users)
+    {
+      if($id eq $user->getId){
+         print ('This id already exists. Cannot save' . "\n");
+         return 'yes';
+      }
+    }
+    return 'no';
 }
 
-sub getName {
-   my( $self ) = @_;
-   return $self->{name};
+sub isValidEmail{
+    my ($class, $email) = @_;
+    if ( $email =~ /([a-zA-Z]+)\@([a-zA-Z]+)\.(com|net|org)/){
+        return 'yes';
+    } else {
+        return 'no';
+    }
 }
 
 1;

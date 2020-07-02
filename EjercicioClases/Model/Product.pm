@@ -4,6 +4,8 @@ use strict;
 use warnings;
 use Data::Dumper;
 
+use Controller::DatabaseController;
+
 
 sub new{
     my $class = shift;
@@ -38,6 +40,21 @@ sub setStatus {
    my ( $self, $status ) = @_;
    $self->{ isAvailable } = $status if defined($status);
    return $self->{isAvailable};
+}
+
+sub getProductBySku{
+    my ( $class, $sku ) = @_;
+    return Controller::DatabaseController->retrieveProductBySku($sku);
+}
+
+sub getProducts{
+    my ( $class, $sku ) = @_;
+    return Controller::DatabaseController->retrieveProducts($sku);
+}
+
+sub save{
+    my ($class, $product) = @_;
+    Controller::DatabaseController->save('products', $product);
 }
 
 1;

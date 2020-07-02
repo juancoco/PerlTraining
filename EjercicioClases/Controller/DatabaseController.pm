@@ -12,52 +12,36 @@ use Model::TransactionRegistry;
 sub new{
     my $class = shift;
     bless {}, $class;
-    #return $self;
+    return $class;
 }
 
-my @sellers = ();
-my @buyers = ();
-my @products = ();
-my @transactions = ();
-
-sub saveSeller{
-    my ($class, $seller) = @_;
-    push(@sellers, $seller);
-}
-
-sub saveBuyer{
-    my ($class, $buyer) = @_;
-    push(@buyers, $buyer);
-}
-
-sub saveProduct{
-    my ($class, $product) = @_; #Forma indicada
-    push (@products, $product);
-}
-
-sub saveTransaction{
-    my ($class, $transaction) = @_;
-    push (@transactions, $transaction);
-}
+my %tables = (
+	sellers => [],
+	buyers => [],
+	products => [],
+    transactions => [],
+);
 
 sub save{
-    my ($tablename, $transaction) = @_;
-}
-
-sub retrieveProducts{
-    return @products;
-}
-
-sub retrieveProductBySku{
-    my ($class, $sku) = @_;
-    print Dumper(@products) . "\n";
-    foreach my $pr (@products){
-        return $pr;
+    my ($class, $tablename, $object) = @_;
+    
+    foreach my $key (keys %tables) {
+        if($key eq $tablename){
+            push( @{$tables{$key}}, $object );
+        }
     }
 }
 
+sub retrieveUsers{
+    return @{$tables{'sellers'}};
+}
+
+sub retrieveProducts{
+    return @{$tables{'products'}};
+}
+
 sub retrieveTransactions{
-    return @products;
+    return @{$tables{'transactions'}};
 }
 
 1;
