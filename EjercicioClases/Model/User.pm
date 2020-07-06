@@ -7,15 +7,15 @@ use Data::Dumper;
 use Controller::DatabaseController;
 
 sub new{
-    my $class = shift;
-    my $self = {
-        id => shift,
-        name => shift,
-        email => shift,
-    };
-    
-    bless $self, $class;
-    return $self;
+   my ( $class, $args ) = @_;
+   my $self = {
+      id => $args->{id} || "",
+      name => $args->{name} || "",
+      email => $args->{email} || "",
+   };
+   
+   bless $self, $class;
+   return $self;
 }
 
 sub getId {
@@ -57,19 +57,18 @@ sub isDuplicatedId{
     foreach my $user (@users)
     {
       if($id eq $user->getId){
-         print ('This id already exists. Cannot save' . "\n");
-         return 'yes';
+         return undef;
       }
     }
-    return 'no';
+    return 1;
 }
 
 sub isValidEmail{
     my ($class, $email) = @_;
     if ( $email =~ /([a-zA-Z]+)\@([a-zA-Z]+)\.(com|net|org)/){
-        return 'yes';
+        return 1;
     } else {
-        return 'no';
+        return undef;
     }
 }
 

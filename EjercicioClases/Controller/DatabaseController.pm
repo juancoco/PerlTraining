@@ -25,10 +25,8 @@ my %tables = (
 sub save{
     my ($class, $tablename, $object) = @_;
     
-    foreach my $key (keys %tables) {
-        if($key eq $tablename){
-            push( @{$tables{$key}}, $object );
-        }
+    if($tables{$tablename}){
+        push( @{$tables{$tablename}}, $object );
     }
 }
 
@@ -42,6 +40,15 @@ sub retrieveProducts{
 
 sub retrieveTransactions{
     return @{$tables{'transactions'}};
+}
+
+sub retrieveProductBySku{
+    my ($class, $sku) = @_;
+    foreach my $product(@{$tables{'products'}}){
+        if($product->getSku eq $sku){
+            return $product;
+        }
+    }
 }
 
 1;

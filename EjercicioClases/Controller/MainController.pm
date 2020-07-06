@@ -44,34 +44,65 @@ sub startApp{
 
 sub createSeller{
     my @sellerData = View::View->inputForm();
-    my $seller = Model::User::Seller->new($sellerData[0], $sellerData[1], $sellerData[2], $sellerData[3], $sellerData[4]);
-    if($seller->isDuplicatedId($seller->getId) eq 'no' && $seller->isValidEmail($seller->getEmail)){
-        $seller->save($seller);
+    my %seller_attrs = (
+        id => $sellerData[0],
+        name => $sellerData[1],
+        email => $sellerData[2],
+        socialReason => $sellerData[3],
+        sellerCode => $sellerData[4],
+    );
+
+    my $seller = Model::User::Seller->new(\%seller_attrs);
+    if($seller->isDuplicatedId($seller->getId) && $seller->isValidEmail($seller->getEmail)){
+        $seller->save();
+        View::View->showMessage('Seller saved succesfully');
+    } else {
+        View::View->showMessage('Seller has duplicated id or invalid email');
     }
 }
 
 sub createBuyer{
     my @buyerData = View::View->inputForm();
-    my $buyer = Model::User::Buyer->new($buyerData[0], $buyerData[1], $buyerData[2]);
-    if($buyer->isDuplicatedId($buyer->getId) eq 'no' && $buyer->isValidEmail($buyer->getEmail)){
-        $buyer->save($buyer);
+    my %buyer_attrs = (
+        id => $buyerData[0],
+        name => $buyerData[1],
+        email => $buyerData[2],
+    );
+
+    my $buyer = Model::User::Buyer->new(\%buyer_attrs);
+    if($buyer->isDuplicatedId($buyer->getId) && $buyer->isValidEmail($buyer->getEmail)){
+        $buyer->save();
+        View::View->showMessage('Buyer saved succesfully');
+    } else {
+        View::View->showMessage('Buyer has duplicated id or invalid email');
     }
 }
 
 sub createProduct{
-    my @productData = VView::iew->inputForm();
-    Model::Product->save(Model::Product->new($productData[0], $productData[1], $productData[2], 'yes'));
+    my @productData = View::View->inputForm();
+    my %product_attrs = (
+        sku => $productData[0],
+        name => $productData[1],
+        sellerCode => $productData[2],
+        isAvailable => '1',
+    );
+    
+    Model::Product->save(Model::Product->new(\%product_attrs));
 }
 
 sub createTransaction{
     my @transactionData = View::View->inputForm();
     my $productToSell = Model::Product->getProductBySku($transactionData[1]);
-    if($productToSell->getStatus eq 'yes'){
-        my $transaction = Model::TransactionRegistry->new($transactionData[0], $transactionData[1]);
-        $transaction->save;
-        $productToSell->setStatus('no');
+    if($productToSell->hasStock()){
+        my %transaction_attrs = (
+            sku => $transactionData[0],
+            sellerCode => $transactionData[2],
+        );
+        my $transaction = Model::TransactionRegistry->new(\%transaction_attrs);
+        $transaction->save();
+        $productToSell->updateStock(undef);
     } else {
-        print 'Product already selled';
+        View::View->showMessage('Product already selled');
     }
 }
 

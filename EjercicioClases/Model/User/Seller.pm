@@ -10,13 +10,11 @@ use Controller::DatabaseController;
 our @ISA = qw(Model::User);
 
 sub new {
-    my ($class) = @_;
-    
-    my $self = $class->SUPER::new( $_[1], $_[2], $_[3] );
-    $self->{socialReason}   = $_[4];
-    $self->{sellerCode} = $_[5];
-    bless $self, $class;
-    return $self;
+    my ( $class, $args ) = @_;
+    $args->{socialReason} = "";
+    $args->{sellerCode} = "";
+    my $local_instance = $class->SUPER::new($args);
+    return $local_instance;
 }
 
 sub getSellerCode {
@@ -25,9 +23,8 @@ sub getSellerCode {
 }
 
 sub save{
-    my ($self, $seller) = @_;
-    Controller::DatabaseController->save('sellers', $seller);
-    #Controller::DatabaseController->saveSeller($seller);
+    my ($self) = @_;
+    Controller::DatabaseController->save('sellers', $self);
 }
 
 1;

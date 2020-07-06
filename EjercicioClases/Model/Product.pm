@@ -8,16 +8,17 @@ use Controller::DatabaseController;
 
 
 sub new{
-    my $class = shift;
-    my $self = {
-        sku => shift,
-        name => shift,
-        sellerCode => shift,
-        isAvailable => shift,
-    };
-    
-    bless $self, $class;
-    return $self;
+   
+   my ( $class, $args ) = @_;
+   my $self = {
+      sku => $args->{sku} || "",
+      name => $args->{name} || "",
+      sellerCode => $args->{sellerCode} || "",
+      isAvailable => $args->{isAvailable} || "",
+   };
+   
+   bless $self, $class;
+   return $self;
 }
 
 sub getProductDetail {
@@ -31,14 +32,14 @@ sub getSku {
     return $self->{sku};
 }
 
-sub getStatus {
+sub hasStock {
     my( $self ) = @_;
     return $self->{isAvailable};
 }
 
-sub setStatus {
+sub updateStock {
    my ( $self, $status ) = @_;
-   $self->{ isAvailable } = $status if defined($status);
+   $self->{ isAvailable } = $status;
    return $self->{isAvailable};
 }
 
