@@ -12,52 +12,43 @@ use Model::TransactionRegistry;
 sub new{
     my $class = shift;
     bless {}, $class;
-    #return $self;
+    return $class;
 }
 
-my @sellers = ();
-my @buyers = ();
-my @products = ();
-my @transactions = ();
-
-sub saveSeller{
-    my ($class, $seller) = @_;
-    push(@sellers, $seller);
-}
-
-sub saveBuyer{
-    my ($class, $buyer) = @_;
-    push(@buyers, $buyer);
-}
-
-sub saveProduct{
-    my ($class, $product) = @_; #Forma indicada
-    push (@products, $product);
-}
-
-sub saveTransaction{
-    my ($class, $transaction) = @_;
-    push (@transactions, $transaction);
-}
+my %tables = (
+	sellers => [],
+	buyers => [],
+	products => [],
+    transactions => [],
+);
 
 sub save{
-    my ($tablename, $transaction) = @_;
+    my ($class, $tablename, $object) = @_;
+    
+    if($tables{$tablename}){
+        push( @{$tables{$tablename}}, $object );
+    }
+}
+
+sub retrieveUsers{
+    return @{$tables{'sellers'}};
 }
 
 sub retrieveProducts{
-    return @products;
+    return @{$tables{'products'}};
+}
+
+sub retrieveTransactions{
+    return @{$tables{'transactions'}};
 }
 
 sub retrieveProductBySku{
     my ($class, $sku) = @_;
-    print Dumper(@products) . "\n";
-    foreach my $pr (@products){
-        return $pr;
+    foreach my $product(@{$tables{'products'}}){
+        if($product->getSku eq $sku){
+            return $product;
+        }
     }
-}
-
-sub retrieveTransactions{
-    return @products;
 }
 
 1;

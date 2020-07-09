@@ -5,24 +5,26 @@ use warnings;
 use Data::Dumper;
 
 use Model::User;
+use Controller::DatabaseController;
 
 our @ISA = qw(Model::User);
 
 sub new {
-    my ($class) = @_;
-    
-    # Call the constructor of the parent class, Person.
-    my $self = $class->SUPER::new( $_[1], $_[2], $_[3] );
-    # Add few more attributes
-    $self->{socialReason}   = $_[4];
-    $self->{sellerCode} = $_[5];
-    bless $self, $class;
-    return $self;
+    my ( $class, $args ) = @_;
+    $args->{socialReason} = "";
+    $args->{sellerCode} = "";
+    my $local_instance = $class->SUPER::new($args);
+    return $local_instance;
 }
 
 sub getSellerCode {
     my( $self ) = @_;
     return $self->{sellerCode};
+}
+
+sub save{
+    my ($self) = @_;
+    Controller::DatabaseController->save('sellers', $self);
 }
 
 1;

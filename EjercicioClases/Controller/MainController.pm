@@ -3,7 +3,6 @@ package Controller::MainController;
 use strict;
 use warnings;
 use Data::Dumper;
-#use lib '/home/juaneduardo.cortes/Documents/PerlTraining/EjercicioClases';
 
 use View::View;
 use Model::User::Seller;
@@ -12,15 +11,10 @@ use Model::Product;
 use Model::TransactionRegistry;
 use Controller::DatabaseController;
 
-my @sellers = ();
-my @buyers = ();
-my @products = ();
-my @transactions = ();
-
 sub new{
     my $class = shift;
     bless {}, $class;
-    #return $self;
+    return $class;
 }
 
 sub startApp{
@@ -28,7 +22,7 @@ sub startApp{
     
     my $exit;
     until($exit){
-        my $option = View->mainMenu();
+        my $option = View::View->mainMenu();
         
         if ($option eq 'createSeller') {
             createSeller();
@@ -49,99 +43,71 @@ sub startApp{
 }
 
 sub createSeller{
-    my @sellerData = View->inputForm();
-    if(isDuplicatedId($sellerData[0]) eq 'no' && isValidEmail($sellerData[2]) eq 'yes'){
-        my $seller = Model::User::Seller->new($sellerData[0], $sellerData[1], $sellerData[2], $sellerData[3], $sellerData[4]);
-        Controller::DatabaseController->saveSeller($seller);
-        #saveSeller($seller);
+    my @sellerData = View::View->inputForm();
+    my %seller_attrs = (
+        id => $sellerData[0],
+        name => $sellerData[1],
+        email => $sellerData[2],
+        socialReason => $sellerData[3],
+        sellerCode => $sellerData[4],
+    );
+
+    my $seller = Model::User::Seller->new(\%seller_attrs);
+    if($seller->isDuplicatedId($seller->getId) && $seller->isValidEmail($seller->getEmail)){
+        $seller->save();
+        View::View->showMessage('Seller saved succesfully');
+    } else {
+        View::View->showMessage('Seller has duplicated id or invalid email');
     }
 }
 
 sub createBuyer{
-    my @buyerData = View->inputForm();
-    if(idDuplicatedId($buyerData[0]) eq 'no' && isValidEmail($buyerData[2]) eq 'yes'){
-        my $buyer = Model::User::Buyer->new($buyerData[0], $buyerData[1], $buyerData[2]);
-        Controller::DatabaseController->saveBuyer($buyer); #hash with key table name
+    my @buyerData = View::View->inputForm();
+    my %buyer_attrs = (
+        id => $buyerData[0],
+        name => $buyerData[1],
+        email => $buyerData[2],
+    );
+
+    my $buyer = Model::User::Buyer->new(\%buyer_attrs);
+    if($buyer->isDuplicatedId($buyer->getId) && $buyer->isValidEmail($buyer->getEmail)){
+        $buyer->save();
+        View::View->showMessage('Buyer saved succesfully');
+    } else {
+        View::View->showMessage('Buyer has duplicated id or invalid email');
     }
 }
 
 sub createProduct{
-    my @productData = View->inputForm();
-    my $product = Model::Product->new($productData[0], $productData[1], $productData[2], 'yes');
-    Controller::DatabaseController->saveProduct($product);
+    my @productData = View::View->inputForm();
+    my %product_attrs = (
+        sku => $productData[0],
+        name => $productData[1],
+        sellerCode => $productData[2],
+        isAvailable => '1',
+    );
+    
+    Model::Product->save(Model::Product->new(\%product_attrs));
 }
 
 sub createTransaction{
-    my @transactionData = View->inputForm();
-    my $productToSell = Controller::DatabaseController->retrieveProductBySku($transactionData[1]);
-    if($productToSell->getStatus eq 'yes'){
-        my $transaction = Model::TransactionRegistry->new($transactionData[0], $transactionData[1]);
-        Controller::DatabaseController->saveTransaction($transaction);
-        $productToSell->setStatus('no');
+    my @transactionData = View::View->inputForm();
+    my $productToSell = Model::Product->getProductBySku($transactionData[1]);
+    if($productToSell->hasStock()){
+        my %transaction_attrs = (
+            sku => $transactionData[0],
+            sellerCode => $transactionData[2],
+        );
+        my $transaction = Model::TransactionRegistry->new(\%transaction_attrs);
+        $transaction->save();
+        $productToSell->updateStock(undef);
     } else {
-        print 'Product already selled';
+        View::View->showMessage('Product already selled');
     }
 }
 
 sub listAvailableProducts{
-    my @pr = Controller::DatabaseController->retrieveProducts();
-    View->showProducts(@pr);
-    #foreach my $i (Controller::DatabaseController->retrieveProducts()){
-    #    if($i->getStatus eq 'yes'){
-    #        print $i->getProductDetail;
-    #    }
-    #}
-}
-
-sub saveSeller{
-    my ($seller) = @_;
-    push(@sellers, $seller);
-    
-    #print @sellers->[0]->id;
-    
-    foreach my $i (@sellers)
-    {
-        $i->getSellerCode;
-        #print Dumper($i);
-    }
-}
-
-sub saveBuyer{
-    my ($buyer) = @_;
-    push(@buyers, $buyer);
-}
-
-sub saveProduct{
-    my ($product) = @_;
-    push (@products, $product);
-}
-
-sub saveTransaction{
-    my ($transaction) = @_;
-    push (@transactions, $transaction);
-}
-
-sub isDuplicatedId{
-    my ($id) = @_;
-    foreach my $seller (@sellers)
-    {
-        if($id eq $seller->getId){
-            #$duplicated = 'yes';
-            print ('This id already exists. Cannot save' . "\n");
-            #exit;
-            return 'yes';
-        }
-    }
-    return 'no';
-}
-
-sub isValidEmail{
-    my ($email) = @_;
-    if ( $email =~ /([a-zA-Z]+)\@([a-zA-Z]+)\.(com|net|org)/){
-        return 'yes';
-    } else {
-        return 'no';
-    }
+    View::View->showProducts(Model::Product->getProducts);
 }
 
 1;
