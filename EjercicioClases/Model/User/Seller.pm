@@ -3,6 +3,7 @@ package Model::User::Seller;
 use strict;
 use warnings;
 use Data::Dumper;
+use DBI;
 
 use Model::User;
 use Controller::DatabaseController;
@@ -11,10 +12,16 @@ our @ISA = qw(Model::User);
 
 sub new {
     my ( $class, $args ) = @_;
-    $args->{socialReason} = "";
-    $args->{sellerCode} = "";
     my $local_instance = $class->SUPER::new($args);
+    $local_instance->{socialReason} = $args->{socialReason};
+    $local_instance->{sellerCode} = $args->{sellerCode};
+    
     return $local_instance;
+}
+
+sub getSocialReason {
+    my( $self ) = @_;
+    return $self->{socialReason};
 }
 
 sub getSellerCode {
@@ -24,7 +31,7 @@ sub getSellerCode {
 
 sub save{
     my ($self) = @_;
-    Controller::DatabaseController->save('sellers', $self);
+    $self->SUPER::saveUser($self);
 }
 
 1;

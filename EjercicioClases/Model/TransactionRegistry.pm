@@ -18,9 +18,31 @@ sub new{
    return $self;
 }
 
+sub getSku {
+   my( $self ) = @_;
+   return $self->{sku};
+}
+
+sub getSellerCode {
+   my( $self ) = @_;
+   return $self->{sellerCode};
+}
+
 sub save{
     my ($class, $transaction) = @_;
-    Controller::DatabaseController->save('transactions', $transaction);
+
+    my $dbConnectionString="DBI:mysql:database=PERL_STORE;host=172.17.0.2;mysql_local_infile1";
+    my $dbLogin="root";
+    my $dbPassword="1234";
+    my $dbh = DBI->connect($dbConnectionString, $dbLogin, $dbPassword, {RaiseError => 1}) or die (" No se pudo conectar: " . DBI->errstr);
+
+    my $sth = $dbh->prepare(
+        "INSERT INTO transactions (sku, seller_code) values (?,?)"
+    );
+    $sth->execute($transaction->getSku, $transaction->getSellerCode) or die $DBI::errstr;
+   
+    $sth->finish();
+    $dbh->disconnect();
 }
 
 1;

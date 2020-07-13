@@ -18,7 +18,7 @@ sub save{
 
 sub save{
     my ($self) = @_;
-    Controller::DatabaseController->save('buyers', $self);
+    $self->SUPER::saveUser($self);
 }
 
 1;

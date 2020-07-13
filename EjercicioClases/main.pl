@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use Data::Dumper;
 
-use lib '/home/juaneduardo.cortes/Documents/PerlTraining/EjercicioClases';
+use lib '/home/juan/Documentos/PerlTraining/PerlTraining/EjercicioClases';
 
 use Controller::MainController;
 
