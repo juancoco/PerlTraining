@@ -78,25 +78,28 @@ sub saveUser{
    my $dbConnectionString="DBI:mysql:database=PERL_STORE;host=172.17.0.2;mysql_local_infile1";
    my $dbLogin="root";
    my $dbPassword="1234";
-   my $dbh = DBI->connect($dbConnectionString, $dbLogin, $dbPassword, {RaiseError => 1}) or die (" No se pudo conectar: " . DBI->errstr);
-
-   my $numberOfParameters;
-   my $parameters;
-   my $socialReason;
-   my $sellerCode;
-
-   eval {
-      $object->getSellerCode;
+   my $dbh;
+   eval{
+      $dbh = DBI->connect($dbConnectionString, $dbLogin, $dbPassword);
    };
-   unless($@){
-      $socialReason = $object->getSocialReason;
-      $sellerCode = $object->getSellerCode;
+   if($@){
+      print "Error conectando a db : $@"
    }
+
+   my $socialReason = UNIVERSAL::can($object, "getSocialReason") ? $object->getSocialReason() : undef;
+   my $sellerCode =  $object->can("getSellerCode") ? $object->getSellerCode() : undef;
+
+   
 
    my $sth = $dbh->prepare(
       "INSERT INTO user (id, name, email, social_reason, seller_code) values (?,?,?,?,?)"
    );
-   $sth->execute($object->getId, $object->getName, $object->getEmail, $socialReason, $sellerCode) or die $DBI::errstr;
+   eval{
+      $sth->execute($object->getId, $object->getName, $object->getEmail, $socialReason, $sellerCode);
+   };
+   if($@){
+      print "Error ejecutando sentencia : $@"
+   }
    
    $sth->finish();
    $dbh->disconnect();

@@ -34,13 +34,25 @@ sub save{
     my $dbConnectionString="DBI:mysql:database=PERL_STORE;host=172.17.0.2;mysql_local_infile1";
     my $dbLogin="root";
     my $dbPassword="1234";
-    my $dbh = DBI->connect($dbConnectionString, $dbLogin, $dbPassword, {RaiseError => 1}) or die (" No se pudo conectar: " . DBI->errstr);
+    my $dbh;
+    eval{
+        $dbh = DBI->connect($dbConnectionString, $dbLogin, $dbPassword);
+    };
+    if($@){
+        print "Error conectando a db : $@"
+    }
 
     my $sth = $dbh->prepare(
         "INSERT INTO transactions (sku, seller_code) values (?,?)"
     );
-    $sth->execute($transaction->getSku, $transaction->getSellerCode) or die $DBI::errstr;
-   
+    
+    eval{
+        $sth->execute($transaction->getSku, $transaction->getSellerCode);
+    };
+    if($@){
+        print "Error ejecutando sentencia : $@"
+    }
+
     $sth->finish();
     $dbh->disconnect();
 }

@@ -59,7 +59,13 @@ sub updateStock {
    my $dbConnectionString="DBI:mysql:database=PERL_STORE;host=172.17.0.2;mysql_local_infile1";
    my $dbLogin="root";
    my $dbPassword="1234";
-   my $dbh = DBI->connect($dbConnectionString, $dbLogin, $dbPassword, {RaiseError => 1}) or die (" No se pudo conectar: " . DBI->errstr);
+   my $dbh;
+   eval{
+      $dbh = DBI->connect($dbConnectionString, $dbLogin, $dbPassword);
+    };
+    if($@){
+      print "Error conectando a db : $@"
+    }
    my $sth = $dbh->prepare(
        "UPDATE product SET stock = ? WHERE sku = ?"
    );
@@ -75,19 +81,32 @@ sub getProductBySku{
     my $dbConnectionString="DBI:mysql:database=PERL_STORE;host=172.17.0.2;mysql_local_infile1";
     my $dbLogin="root";
     my $dbPassword="1234";
-    my $dbh = DBI->connect($dbConnectionString, $dbLogin, $dbPassword, {RaiseError => 1}) or die (" No se pudo conectar: " . DBI->errstr);
+    my $dbh;
+    eval{
+      $dbh = DBI->connect($dbConnectionString, $dbLogin, $dbPassword);
+    };
+    if($@){
+      print "Error conectando a db : $@"
+    }
 
     my $sth = $dbh->prepare(
         "SELECT sku, name, seller_code, stock FROM product WHERE sku = ?"
     );
-    $sth->execute($sku) or die $DBI::errstr;
+
+    eval{
+        $sth->execute($sku) or die $DBI::errstr;
+    };
+    if($@){
+        print "Error ejecutando sentencia : $@"
+    }
+
     my @row = $sth->fetchrow_array();
-    my ($sku, $name, $seller, $stock) = @row;
+    my ($rsku, $rname, $rseller, $rstock) = @row;
     my %product_attrs = (
-        sku => $sku,
-        name => $name,
-        sellerCode => $seller,
-        isAvailable => $stock,
+        sku => $rsku,
+        name => $rname,
+        sellerCode => $rseller,
+        isAvailable => $rstock,
     );
     $sth->finish();
     $dbh->disconnect();
@@ -100,12 +119,24 @@ sub getProducts{
     my $dbConnectionString="DBI:mysql:database=PERL_STORE;host=172.17.0.2;mysql_local_infile1";
     my $dbLogin="root";
     my $dbPassword="1234";
-    my $dbh = DBI->connect($dbConnectionString, $dbLogin, $dbPassword, {RaiseError => 1}) or die (" No se pudo conectar: " . DBI->errstr);
+    my $dbh;
+    eval{
+      $dbh = DBI->connect($dbConnectionString, $dbLogin, $dbPassword);
+    };
+    if($@){
+      print "Error conectando a db : $@"
+    }
 
     my $sth = $dbh->prepare(
         "SELECT sku, name, seller_code, stock FROM product"
     );
-    $sth->execute() or die $DBI::errstr;
+
+    eval{
+        $sth->execute() or die $DBI::errstr;
+    };
+    if($@){
+        print "Error ejecutando sentencia : $@"
+    }
 
     my @products;
     
@@ -130,12 +161,23 @@ sub save{
     my $dbConnectionString="DBI:mysql:database=PERL_STORE;host=172.17.0.2;mysql_local_infile1";
     my $dbLogin="root";
     my $dbPassword="1234";
-    my $dbh = DBI->connect($dbConnectionString, $dbLogin, $dbPassword, {RaiseError => 1}) or die (" No se pudo conectar: " . DBI->errstr);
+    my $dbh;
+    eval{
+      $dbh = DBI->connect($dbConnectionString, $dbLogin, $dbPassword);
+    };
+    if($@){
+      print "Error conectando a db : $@"
+    }
 
     my $sth = $dbh->prepare(
         "INSERT INTO product (sku, name, seller_code, stock) values (?,?,?,?)"
     );
-    $sth->execute($product->getSku, $product->getName, $product->getSellerCode, $product->getStock) or die $DBI::errstr;
+    eval{
+        $sth->execute($product->getSku, $product->getName, $product->getSellerCode, $product->getStock) or die $DBI::errstr;
+    };
+    if($@){
+        print "Error ejecutando sentencia : $@"
+    }
    
     $sth->finish();
     $dbh->disconnect();

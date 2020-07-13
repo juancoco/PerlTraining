@@ -96,10 +96,10 @@ sub createTransaction{
     if($productToSell->hasStock()){
         my %transaction_attrs = (
             sku => $transactionData[0],
-            sellerCode => $transactionData[2],
+            sellerCode => $transactionData[1],
         );
         my $transaction = Model::TransactionRegistry->new(\%transaction_attrs);
-        $transaction->save();
+        $transaction->save($transaction);
         $productToSell->updateStock(undef);
     } else {
         View::View->showMessage('Product already selled');
