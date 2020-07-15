@@ -2,9 +2,8 @@ package Model::User;
 
 use strict;
 use warnings;
-use Data::Dumper;
 
-use Controller::DatabaseController;
+use Utils::Connection;
 
 sub new{
    my ( $class, $args ) = @_;
@@ -75,22 +74,9 @@ sub isValidEmail{
 sub saveUser{
    my ($class, $object) = @_;
 
-   my $dbConnectionString="DBI:mysql:database=PERL_STORE;host=172.17.0.2;mysql_local_infile1";
-   my $dbLogin="root";
-   my $dbPassword="1234";
-   my $dbh;
-   eval{
-      $dbh = DBI->connect($dbConnectionString, $dbLogin, $dbPassword);
-   };
-   if($@){
-      print "Error conectando a db : $@"
-   }
-
+   my $dbh = Utils::Connection->dbconnect();
    my $socialReason = UNIVERSAL::can($object, "getSocialReason") ? $object->getSocialReason() : undef;
    my $sellerCode =  $object->can("getSellerCode") ? $object->getSellerCode() : undef;
-
-   
-
    my $sth = $dbh->prepare(
       "INSERT INTO user (id, name, email, social_reason, seller_code) values (?,?,?,?,?)"
    );
@@ -98,7 +84,7 @@ sub saveUser{
       $sth->execute($object->getId, $object->getName, $object->getEmail, $socialReason, $sellerCode);
    };
    if($@){
-      print "Error ejecutando sentencia : $@"
+      die "Error ejecutando sentencia : $@";
    }
    
    $sth->finish();

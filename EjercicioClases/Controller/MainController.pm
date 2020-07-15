@@ -2,7 +2,6 @@ package Controller::MainController;
 
 use strict;
 use warnings;
-use Data::Dumper;
 
 use View::View;
 use Model::User::Seller;
@@ -53,7 +52,7 @@ sub createSeller{
     );
 
     my $seller = Model::User::Seller->new(\%seller_attrs);
-    if($seller->isDuplicatedId($seller->getId) && $seller->isValidEmail($seller->getEmail)){
+    if($seller->isDuplicatedId($seller->getId()) && $seller->isValidEmail($seller->getEmail())){
         $seller->save();
         View::View->showMessage('Seller saved succesfully');
     } else {
@@ -70,7 +69,7 @@ sub createBuyer{
     );
 
     my $buyer = Model::User::Buyer->new(\%buyer_attrs);
-    if($buyer->isDuplicatedId($buyer->getId) && $buyer->isValidEmail($buyer->getEmail)){
+    if($buyer->isDuplicatedId($buyer->getId()) && $buyer->isValidEmail($buyer->getEmail())){
         $buyer->save();
         View::View->showMessage('Buyer saved succesfully');
     } else {
@@ -86,8 +85,8 @@ sub createProduct{
         sellerCode => $productData[2],
         isAvailable => '1',
     );
-    
-    Model::Product->save(Model::Product->new(\%product_attrs));
+    my $product = Model::Product->new(\%product_attrs);
+    $product->save();
 }
 
 sub createTransaction{
@@ -99,7 +98,7 @@ sub createTransaction{
             sellerCode => $transactionData[1],
         );
         my $transaction = Model::TransactionRegistry->new(\%transaction_attrs);
-        $transaction->save($transaction);
+        $transaction->save();
         $productToSell->updateStock(undef);
     } else {
         View::View->showMessage('Product already selled');
@@ -107,7 +106,7 @@ sub createTransaction{
 }
 
 sub listAvailableProducts{
-    View::View->showProducts(Model::Product->getProducts);
+    View::View->showProducts(Model::Product->getProducts());
 }
 
 1;

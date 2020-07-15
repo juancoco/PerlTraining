@@ -2,8 +2,6 @@ package Model::User::Seller;
 
 use strict;
 use warnings;
-use Data::Dumper;
-use DBI;
 
 use Model::User;
 use Controller::DatabaseController;
