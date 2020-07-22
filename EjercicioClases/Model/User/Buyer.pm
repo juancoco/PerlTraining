@@ -2,7 +2,6 @@ package Model::User::Buyer;
 
 use strict;
 use warnings;
-use Data::Dumper;
 
 use Model::User;
 use Controller::DatabaseController;
@@ -18,7 +17,7 @@ sub save{
 
 sub save{
     my ($self) = @_;
-    Controller::DatabaseController->save('buyers', $self);
+    $self->SUPER::saveUser($self);
 }
 
 1;

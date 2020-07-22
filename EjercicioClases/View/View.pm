@@ -2,7 +2,6 @@ package View::View;
 
 use strict;
 use warnings;
-use Data::Dumper;
 
 my @options = ("1.Registrar vendedor", "2.Registrar comprador", "3.Registrar producto", "4.Registrar venta", "5.Listar productos", "0.Exit");
 

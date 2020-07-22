@@ -2,7 +2,6 @@ package Controller::DatabaseController;
 
 use strict;
 use warnings;
-use Data::Dumper;
 
 use Model::User::Seller;
 use Model::User::Buyer;

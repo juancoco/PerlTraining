@@ -2,9 +2,8 @@ package Model::User;
 
 use strict;
 use warnings;
-use Data::Dumper;
 
-use Controller::DatabaseController;
+use Utils::Connection;
 
 sub new{
    my ( $class, $args ) = @_;
@@ -70,6 +69,26 @@ sub isValidEmail{
     } else {
         return undef;
     }
+}
+
+sub saveUser{
+   my ($class, $object) = @_;
+
+   my $dbh = Utils::Connection->dbconnect();
+   my $socialReason = UNIVERSAL::can($object, "getSocialReason") ? $object->getSocialReason() : undef;
+   my $sellerCode =  $object->can("getSellerCode") ? $object->getSellerCode() : undef;
+   my $sth = $dbh->prepare(
+      "INSERT INTO user (id, name, email, social_reason, seller_code) values (?,?,?,?,?)"
+   );
+   eval{
+      $sth->execute($object->getId, $object->getName, $object->getEmail, $socialReason, $sellerCode);
+   };
+   if($@){
+      die "Error ejecutando sentencia : $@";
+   }
+   
+   $sth->finish();
+   $dbh->disconnect();
 }
 
 1;

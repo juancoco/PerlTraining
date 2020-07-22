@@ -2,9 +2,8 @@ package Model::TransactionRegistry;
 
 use strict;
 use warnings;
-use Data::Dumper;
 
-use Controller::DatabaseController;
+use Utils::Connection;
 
 sub new{
     
@@ -18,9 +17,33 @@ sub new{
    return $self;
 }
 
+sub getSku {
+   my( $self ) = @_;
+   return $self->{sku};
+}
+
+sub getSellerCode {
+   my( $self ) = @_;
+   return $self->{sellerCode};
+}
+
 sub save{
-    my ($class, $transaction) = @_;
-    Controller::DatabaseController->save('transactions', $transaction);
+    my ($self) = @_;
+
+    my $dbh = Utils::Connection->dbconnect();
+    my $sth = $dbh->prepare(
+        "INSERT INTO transactions (sku, seller_code) values (?,?)"
+    );
+    
+    eval{
+        $sth->execute($self->{sku}, $self->{sellerCode});
+    };
+    if($@){
+        die "Error ejecutando sentencia : $@";
+    }
+
+    $sth->finish();
+    $dbh->disconnect();
 }
 
 1;
